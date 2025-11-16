@@ -1,0 +1,301 @@
+# My_buddy — Agentic GenAI Personal Assistant  
+A Multi-Agent, RAG-Powered, Full-Stack AI Productivity Platform
+
+My_buddy is an agentic personal assistant powered by modern GenAI technologies.  
+It uses multi-agent reasoning, RAG (Retrieval Augmented Generation), an orchestrator layer,  
+and a complete frontend + backend stack to deliver an intelligent productivity system.
+
+This project demonstrates full-stack GenAI engineering skills suitable for professional hiring evaluations.
+
+---
+
+## 1. System Architecture
+
+┌─────────────────────────────────────────────────────────────┐
+│ FRONTEND │
+│ React + Vite + Tailwind + Axios │
+└─────────────────────────────────────────────────────────────┘
+│
+▼
+┌─────────────────────────────────────────────────────────────┐
+│ FASTAPI BACKEND │
+│ │
+│ ┌───────────────────────────────────────────────────────┐ │
+│ │ ORCHESTRATOR (Brain) │ │
+│ │ - Intent Classification │ │
+│ │ - Agent Routing │ │
+│ │ - Context + Memory │ │
+│ └───────────────────────────────────────────────────────┘ │
+│ │ │ │
+│ ▼ ▼ ▼
+│ ┌──────────────┐ ┌──────────────┐ ┌─────────────┐
+│ │ Task Agent │ │ ScheduleAgent│ │AnalyticsAgent│
+│ └──────────────┘ └──────────────┘ └─────────────┘
+│ │
+│ ▼
+│ ┌──────────────────────┐
+│ │ QueryAgent │ <─── RAG Pipeline
+│ │ (Vector Retrieval) │
+│ └──────────────────────┘
+│ │
+│ ▼
+│ ┌─────────────────────────────────────┐
+│ │ LLM Engine (Ollama + Llama3) │
+│ └─────────────────────────────────────┘
+│
+└─────────────────────────────────────────────────────────────┘
+
+yaml
+Copy code
+
+---
+
+## 2. Multi-Agent System
+
+### Orchestrator
+Coordinates all AI behavior:
+- Detects user intent  
+- Routes tasks to the correct agent  
+- Provides memory and context  
+- Fallback to LLM when uncertain  
+
+### TaskAgent
+Handles task and goal operations:
+- Create, update, delete, complete  
+- Auto-categorization  
+- Links tasks with goals  
+
+### ScheduleAgent
+AI scheduling:
+- Suggests ideal time slots  
+- Learns from user patterns  
+- Optimizes productivity windows  
+
+### AnalyticsAgent
+Insight generation:
+- Productivity scores  
+- Goal alignment  
+- Historical trends  
+- Weekly performance analysis  
+
+### QueryAgent (RAG)
+Retrieval-Augmented Generation:
+- Embeds user data  
+- Vector search (ChromaDB)  
+- Supplies context to LLM  
+- Produces accurate, factual answers  
+
+---
+
+## 3. RAG Pipeline
+
+[User Query]
+│
+▼
+[Embed via SentenceTransformer MiniLM]
+│
+▼
+[ChromaDB Vector Search]
+│
+▼
+[Top-K Documents Retrieved]
+│
+▼
+[Context Injection to Llama3]
+│
+▼
+[Final Answer Returned]
+
+yaml
+Copy code
+
+---
+
+## 4. Features
+
+### GenAI Chat Assistant
+- Conversational reasoning  
+- Understands tasks, goals, and schedules  
+- Context-aware responses  
+
+### Agentic Intelligence
+- Modular, extendable agents  
+- Dynamic decision making  
+- Autonomous action execution  
+
+### Task & Goal Management
+- Create and organize tasks  
+- Track progress and streaks  
+- Manage long-term goals  
+
+### Analytics Dashboard
+- Daily productivity  
+- Goal completion metrics  
+- Performance trends  
+
+### RAG-Powered Search
+- Ask questions about your own data  
+- Full semantic recall  
+- No hallucinations (context-grounded answers)  
+
+### Secure Notes Vault
+- Encrypted notes  
+- Stored and retrieved through VaultAgent  
+
+---
+
+## 5. Tech Stack
+
+### Backend
+- FastAPI  
+- Python 3.11  
+- Ollama + Llama3  
+- ChromaDB (Vector DB)  
+- SentenceTransformers  
+- Pydantic v2  
+- Redis (optional future extension)
+
+### Frontend
+- React (Vite)  
+- TailwindCSS  
+- Framer Motion  
+- Axios  
+
+---
+
+## 6. Installation and Setup
+
+### Prerequisites
+- Python 3.11  
+- Node.js 18+  
+- Ollama (installed and running)  
+- Git  
+
+---
+
+### Backend Setup
+
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate      # Windows
+pip install -r requirements.txt
+Create .env file:
+
+ini
+Copy code
+DEBUG=True
+ENVIRONMENT=development
+LLM_MODEL=llama3
+OLLAMA_URL=http://localhost:11434
+CHROMA_PATH=./chroma_db
+CHROMA_COLLECTION=notiontablet_kb
+RAG_TOP_K=5
+ALLOWED_ORIGINS=http://localhost:3000
+Run backend:
+
+bash
+Copy code
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+Install Llama3 model
+bash
+Copy code
+ollama pull llama3
+Frontend Setup
+bash
+Copy code
+cd frontend
+npm install
+npm run dev
+7. API Overview
+POST /api/v1/chat/message
+Accepts:
+
+json
+Copy code
+{
+  "content": "add a task to workout tomorrow"
+}
+Returns:
+
+json
+Copy code
+{
+  "role": "assistant",
+  "content": "Task created: workout",
+  "metadata": {
+    "intent": "task_create",
+    "agent": "TaskAgent"
+  }
+}
+8. Folder Structure (Final)
+lua
+Copy code
+my_buddy--agentic-ai/
+│
+├── backend/
+│   ├── ai/
+│   │   ├── agents/
+│   │   ├── embeddings.py
+│   │   ├── llm.py
+│   │   └── orchestrator.py
+│   ├── main.py
+│   ├── config.py
+│   ├── requirements.txt
+│   └── .env.example
+│
+└── frontend/
+    ├── src/
+    │   ├── components/
+    │   ├── chat/
+    │   └── App.jsx
+    ├── package.json
+    ├── index.html
+    └── vite.config.js
+9. Roadmap
+Add real user authentication
+
+Add calendar sync (Google Calendar API)
+
+Add voice input + TTS
+
+Add long-term memory store
+
+Add multi-modal capabilities (images, documents)
+
+Expand agent tools
+
+10. Recruiter Notes (Why This Project Matters)
+This project demonstrates:
+
+Full-stack GenAI engineering
+
+Multi-agent architecture design
+
+LLM orchestration & context routing
+
+RAG implementation with vector search
+
+Production-grade FastAPI backend
+
+React + Tailwind modern frontend
+
+Working AI assistant with real reasoning
+
+Ability to integrate and deploy AI systems end-to-end
+
+If you're evaluating this project for a technical role, this repository showcases skills relevant to:
+
+AI Engineering
+
+Software Engineering
+
+Machine Learning Engineering
+
+Full-Stack Development
+
+Systems Architecture
+
+License
+MIT License
+

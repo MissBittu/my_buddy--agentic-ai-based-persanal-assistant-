@@ -1,0 +1,21 @@
+# Python env
+backend/venv/
+
+# Node modules
+frontend/node_modules/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Environment files
+*.env
+backend/.env
+frontend/.env
+
+# Chroma vector DB
+backend/chroma_db/
+
+# IDE
+.vscode/
+.idea/
