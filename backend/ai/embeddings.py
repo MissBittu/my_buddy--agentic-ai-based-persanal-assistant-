@@ -1,5 +1,5 @@
 import requests
-from config import settings
+from backend.app.config import settings
 
 def embed(text: str):
     response = requests.post(
