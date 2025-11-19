@@ -1,7 +1,7 @@
 import chromadb
 from chromadb.config import Settings
 from ai.embeddings import embed
-from config import settings
+from backend.app.config import settings
 
 client = chromadb.PersistentClient(path=settings.CHROMA_PATH)
 
