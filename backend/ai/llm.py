@@ -1,4 +1,4 @@
-from config import settings
+from backend.app.config import settings
 import requests
 
 class LLM:
