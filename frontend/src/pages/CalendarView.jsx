@@ -1,176 +1,130 @@
-import React, { useState } from "react";
-import { Plus, Calendar as CalendarIcon, X } from "lucide-react";
+import React, { useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const CalendarView = ({ darkMode, cardClass, events, setCalendarEvents, setNotifications }) => {
-  const [showModal, setShowModal] = useState(false);
-  const [newTitle, setNewTitle] = useState("");
-  const [newDate, setNewDate] = useState("");
-  const [newTime, setNewTime] = useState("");
+const CalendarView = ({ darkMode, cardClass, events }) => {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
 
-  const daysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+  const monthNames = [
+    'January','February','March','April','May','June',
+    'July','August','September','October','November','December'
+  ];
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth();
-
-  const totalDays = daysInMonth(year, month);
-  const firstDay = new Date(year, month, 1).getDay();
-
-  const addEvent = () => {
-    if (!newTitle.trim() || !newDate.trim()) return;
-
-    const newEvent = {
-      id: Date.now(),
-      title: newTitle,
-      date: newDate,
-      time: newTime || "",
-      type: "custom",
+  const getDaysInMonth = date => {
+    const y = date.getFullYear();
+    const m = date.getMonth();
+    return {
+      days: new Date(y, m + 1, 0).getDate(),
+      start: new Date(y, m, 1).getDay()
     };
-
-    setCalendarEvents((prev) => [...prev, newEvent]);
-
-    setNotifications((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        message: `New event added: ${newTitle}`,
-        date: new Date().toISOString(),
-      },
-    ]);
-
-    setNewTitle("");
-    setNewDate("");
-    setNewTime("");
-    setShowModal(false);
   };
 
-  const getEventsForDate = (date) =>
-    events.filter((event) => event.date === date);
+  const { days, start } = getDaysInMonth(currentDate);
+
+  const prevMonth = () =>
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+
+  const nextMonth = () =>
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+
+  const eventsForDay = day => {
+    const d = `${currentDate.getFullYear()}-${String(
+      currentDate.getMonth() + 1
+    ).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    return events.filter(e => e.date === d);
+  };
 
   return (
-    <div className="space-y-6 relative">
-
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold flex items-center gap-2">
-          <CalendarIcon className="w-6 h-6" />
-          Calendar
-        </h2>
-
-        <button
-          onClick={() => setShowModal(true)}
-          className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" /> Add Event
-        </button>
+        <h2 className="text-3xl font-bold">Calendar 📅</h2>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={prevMonth} 
+            className={`p-2 rounded-lg transition ${darkMode ? 'hover:bg-white/10' : 'hover:bg-black/10'}`}
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <h3 className="text-xl font-semibold">
+            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+          </h3>
+          <button 
+            onClick={nextMonth} 
+            className={`p-2 rounded-lg transition ${darkMode ? 'hover:bg-white/10' : 'hover:bg-black/10'}`}
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
-      {/* Calendar Grid */}
-      <div
-        className={`${cardClass} border rounded-xl p-6 grid grid-cols-7 gap-2`}
-      >
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-          <div key={d} className="text-center font-bold opacity-70">
-            {d}
-          </div>
-        ))}
-
-        {Array(firstDay)
-          .fill(null)
-          .map((_, i) => (
-            <div key={"empty-" + i}></div>
-          ))}
-
-        {Array(totalDays)
-          .fill(null)
-          .map((_, i) => {
-            const date = `${year}-${String(month + 1).padStart(2, "0")}-${String(
-              i + 1
-            ).padStart(2, "0")}`;
-            const dayEvents = getEventsForDate(date);
-
+      <div className={`${cardClass} border rounded-xl p-6`}>
+        <div className="grid grid-cols-7 text-center font-semibold mb-4">
+          {dayNames.map(d => <div key={d} className="py-2">{d}</div>)}
+        </div>
+        
+        <div className="grid grid-cols-7 gap-2">
+          {[...Array(start)].map((_, i) => <div key={`empty-${i}`} className="aspect-square" />)}
+          
+          {[...Array(days)].map((_, i) => {
+            const day = i + 1;
+            const ev = eventsForDay(day);
             const isToday =
-              date === today.toISOString().split("T")[0];
+              day === new Date().getDate() &&
+              currentDate.getMonth() === new Date().getMonth() &&
+              currentDate.getFullYear() === new Date().getFullYear();
 
             return (
-              <div
-                key={i}
-                className={`${cardClass} border rounded-lg p-2 h-32 overflow-auto ${
-                  isToday ? "ring-2 ring-purple-500" : ""
+              <div 
+                key={day}
+                onClick={() => setSelectedDate(day)}
+                className={`p-2 aspect-square rounded-lg cursor-pointer border transition ${
+                  isToday ? 'bg-purple-500/20 border-purple-500' : 
+                  darkMode ? 'border-gray-700 hover:bg-white/5' : 'border-gray-200 hover:bg-black/5'
                 }`}
               >
-                <p className="font-bold">{i + 1}</p>
-
-                {dayEvents.length > 0 && (
-                  <div className="mt-2 space-y-1">
-                    {dayEvents.map((ev) => (
-                      <div
-                        key={ev.id}
-                        className="text-xs p-1 rounded bg-purple-600/40 border border-purple-600 truncate"
-                      >
-                        {ev.title}
-                      </div>
-                    ))}
+                <div className="text-sm font-semibold mb-1">{day}</div>
+                {ev.slice(0, 2).map((e, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`text-xs truncate px-1 rounded mb-1 ${
+                      e.type === 'goal' ? 'bg-blue-500/20 text-blue-400' : 'bg-orange-500/20 text-orange-400'
+                    }`}
+                  >
+                    {e.time} {e.title}
                   </div>
-                )}
+                ))}
+                {ev.length > 2 && <div className="text-xs text-gray-500">+{ev.length - 2} more</div>}
               </div>
             );
           })}
+        </div>
       </div>
 
-      {/* Add Event Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className={`${cardClass} border rounded-xl p-6 w-full max-w-md`}>
-
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold">Add Event</h3>
-              <button
-                onClick={() => setShowModal(false)}
-                className="p-2 hover:bg-white/10 rounded-lg"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              <div>
-                <label className="text-sm opacity-70">Event Title</label>
-                <input
-                  type="text"
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  className={`${cardClass} border rounded-lg w-full p-2`}
-                />
+      {selectedDate && (
+        <div className={`${cardClass} border rounded-xl p-6`}>
+          <h3 className="text-xl font-bold mb-4">
+            Events for {monthNames[currentDate.getMonth()]} {selectedDate}, {currentDate.getFullYear()}
+          </h3>
+          <div className="space-y-3">
+            {eventsForDay(selectedDate).map((event, idx) => (
+              <div key={idx} className={`p-4 rounded-lg ${darkMode ? 'bg-white/5' : 'bg-black/5'}`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`px-2 py-1 rounded text-xs ${
+                    event.type === 'goal' ? 'bg-blue-500/20 text-blue-400' : 'bg-orange-500/20 text-orange-400'
+                  }`}>
+                    {event.type}
+                  </span>
+                  {event.time && <span className="text-sm">{event.time}</span>}
+                </div>
+                <h4 className="font-semibold">{event.title}</h4>
               </div>
-
-              <div>
-                <label className="text-sm opacity-70">Date</label>
-                <input
-                  type="date"
-                  value={newDate}
-                  onChange={(e) => setNewDate(e.target.value)}
-                  className={`${cardClass} border rounded-lg w-full p-2`}
-                />
-              </div>
-
-              <div>
-                <label className="text-sm opacity-70">Time (optional)</label>
-                <input
-                  type="time"
-                  value={newTime}
-                  onChange={(e) => setNewTime(e.target.value)}
-                  className={`${cardClass} border rounded-lg w-full p-2`}
-                />
-              </div>
-
-              <button
-                onClick={addEvent}
-                className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium"
-              >
-                Save Event
-              </button>
-            </div>
-
+            ))}
+            {eventsForDay(selectedDate).length === 0 && (
+              <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
+                No events scheduled for this day.
+              </p>
+            )}
           </div>
         </div>
       )}
