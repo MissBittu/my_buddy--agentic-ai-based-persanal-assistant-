@@ -2,8 +2,8 @@ import React from 'react';
 import { CheckCircle, Target, TrendingUp } from 'lucide-react';
 
 const Dashboard = ({ darkMode, cardClass, dailyGoals, longTermGoals }) => {
-  const completedGoals = dailyGoals.filter(g => g.completed).length;
-  const totalGoals = dailyGoals.length;
+  const completedGoals = dailyGoals ? dailyGoals.filter(g => g.completed).length : 0;
+  const totalGoals = dailyGoals ? dailyGoals.length : 0;
   const productivity = totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0;
 
   const stats = [
@@ -16,7 +16,7 @@ const Dashboard = ({ darkMode, cardClass, dailyGoals, longTermGoals }) => {
     },
     { 
       label: 'Active Goals', 
-      value: longTermGoals.length.toString(), 
+      value: longTermGoals ? longTermGoals.length.toString() : '0', 
       change: '+2', 
       icon: Target, 
       color: 'text-blue-500' 
@@ -62,27 +62,33 @@ const Dashboard = ({ darkMode, cardClass, dailyGoals, longTermGoals }) => {
       <div className={`${cardClass} border rounded-xl p-6`}>
         <h3 className="text-xl font-bold mb-4">Recent Activity</h3>
         <div className="space-y-3">
-          {dailyGoals.slice(0, 5).map((goal) => (
-            <div 
-              key={goal.id} 
-              className={`flex items-center gap-3 p-3 rounded-lg transition ${
-                darkMode ? 'hover:bg-white/5' : 'hover:bg-black/5'
-              }`}
-            >
-              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-              <div className="flex-1">
-                <p>
-                  <span className="text-purple-400">
-                    {goal.completed ? 'Completed' : 'Pending'}
-                  </span>
-                  : {goal.text}
-                </p>
-                <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {goal.time || 'No time set'}
-                </p>
+          {dailyGoals && dailyGoals.length > 0 ? (
+            dailyGoals.slice(0, 5).map((goal) => (
+              <div 
+                key={goal.id} 
+                className={`flex items-center gap-3 p-3 rounded-lg transition ${
+                  darkMode ? 'hover:bg-white/5' : 'hover:bg-black/5'
+                }`}
+              >
+                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                <div className="flex-1">
+                  <p>
+                    <span className="text-purple-400">
+                      {goal.completed ? 'Completed' : 'Pending'}
+                    </span>
+                    : {goal.text}
+                  </p>
+                  <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    {goal.time || 'No time set'}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
+              No recent activity yet. Start by adding some goals! 🎯
+            </p>
+          )}
         </div>
       </div>
     </div>
