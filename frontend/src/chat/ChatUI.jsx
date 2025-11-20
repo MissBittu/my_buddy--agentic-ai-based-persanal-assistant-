@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import ChatMessage from "./ChatMessage";
-import { sendChatMessage } from "../api/chat";
+import { sendChatMessage } from "../components/api/chat";
 import { Send } from "lucide-react";
 
 export default function ChatUI() {

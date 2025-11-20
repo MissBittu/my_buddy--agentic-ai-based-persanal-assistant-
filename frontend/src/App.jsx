@@ -7,7 +7,6 @@ import {
   Clock, CheckCircle, AlertCircle, TrendingUp, X, Send,
   Save, Eye, EyeOff, Filter, ChevronLeft, ChevronRight
 } from 'lucide-react';
-
 import DailyGoals from './pages/DailyGoals';
 import LongTermGoals from './pages/LongTermGoals';
 import AIAssistant from './pages/AIAssistant';
@@ -621,9 +620,7 @@ const Sidebar = ({ currentPage, setCurrentPage, darkMode, cardClass }) => {
       </nav>
     </aside>
   );
-};
-
-const Dashboard = ({ darkMode, cardClass, dailyGoals, longTermGoals }) => {
+};const Dashboard = ({ darkMode, cardClass, dailyGoals, longTermGoals }) => {
   const completedGoals = dailyGoals.filter(g => g.completed).length;
   const totalGoals = dailyGoals.length;
   const productivity = totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0;
